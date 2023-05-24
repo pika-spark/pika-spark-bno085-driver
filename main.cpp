@@ -12,10 +12,12 @@
 #include <stdexcept>
 
 #include "spi.h"
+#include "bno085.h"
 
 int main(int /* argc */, char ** /* argv */) try
 {
-  auto spi = std::make_shared<SPI>("/dev/spidev1.0", SPI_MODE_0, 8, 1000000);
+  auto spi = std::make_shared<SPI>("/dev/spidev1.0", SPI_MODE_3, 8, 1*1000*1000UL);
+  auto bno085 = std::make_shared<BNO085>(spi);
   return EXIT_SUCCESS;
 }
 catch (std::runtime_error const & err)
