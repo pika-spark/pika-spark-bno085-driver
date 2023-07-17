@@ -9,6 +9,7 @@ add_executable(${PROJECT_NAME}
   main.cpp
   bno085.cpp
   spi.cpp
+  gpio-sysfs.cpp
 )
 ##########################################################################
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
