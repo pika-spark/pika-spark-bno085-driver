@@ -10,20 +10,9 @@ Linux user space driver for the [BNO085](https://www.ceva-dsp.com/wp-content/upl
   <a href="https://pika-spark.io/"><img src="https://raw.githubusercontent.com/pika-spark/.github/main/logo/logo-pika-spark-bg-white-github.png" width="40%"></a>
 </p>
 
-### How-to-build
-* Enable [spidev](https://www.kernel.org/doc/Documentation/spi/spidev) to access SPI from userspace
+### How-to-build/run
 ```bash
-modprobe spidev
-sudo chmod ugo+rw /dev/spidev1.0
-```
-* Build user space driver within Docker container with access to SPI
-```bash
-docker pull alpine:latest
-docker run -it -u 0 --device /dev/spidev1.0 alpine:latest sh
-apk add git g++ make cmake linux-headers
-cd /tmp
-git clone https://github.com/107-systems/pika-spark-bno085-driver && cd pika-spark-bno085-driver
-mkdir build && cd build
-cmake ..
-make
+git clone https://github.com/pika-spark/pika-spark-bno085-driver && cd pika-spark-bno085-driver/docker
+./docker-build.sh
+sudo ./docker-run.sh
 ```
