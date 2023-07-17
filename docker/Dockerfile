@@ -4,7 +4,7 @@ FROM alpine:3.18
 
 RUN apk add git g++ make cmake linux-headers && \
     cd /tmp && \
-    git clone --recursive https://github.com/107-systems/pika-spark-bno085-driver && \
+    git clone --recursive https://github.com/pika-spark/pika-spark-bno085-driver && \
     cd pika-spark-bno085-driver && \
     mkdir build && \
     cd build && \
