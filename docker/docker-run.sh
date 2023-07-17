@@ -29,4 +29,4 @@ echo $GPIO_NBOOT_NUM > /sys/class/gpio/export
 modprobe spidev
 chmod ugo+rw /dev/spidev1.0
 
-sudo -u fio docker run -it --rm -u 0 --privileged --device /dev/spidev1.0 -v /sys/class/gpio:/sys/class/gpio pika_spark_bno085_driver sh
+sudo -u fio docker run -it --ulimit nofile=1024:1024 --rm -u 0 --privileged --device /dev/spidev1.0 -v /sys/class/gpio:/sys/class/gpio pika_spark_bno085_driver sh
