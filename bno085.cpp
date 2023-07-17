@@ -33,7 +33,6 @@ BNO085::BNO085(std::shared_ptr<SPI> const spi)
 {
   _sh2_hal.user_reference = reinterpret_cast<void *>(this);
 
-  reset();
   init();
 }
 
@@ -84,11 +83,6 @@ uint32_t BNO085::sh2_hal_getTimeUs()
 /**************************************************************************************
  * PRIVATE MEMBER FUNCTIONS
  **************************************************************************************/
-
-void BNO085::reset()
-{
-  /* TODO. */
-}
 
 void BNO085::init()
 {

@@ -39,6 +39,5 @@ private:
   std::chrono::steady_clock::time_point const _start;
   sh2_Hal_t _sh2_hal;
 
-  void reset();
   void init();
 };
