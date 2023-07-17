@@ -12,7 +12,7 @@ Linux user space driver for the [BNO085](https://www.ceva-dsp.com/wp-content/upl
 
 ### How-to-build/run
 ```bash
-git clone https://github.com/pika-spark/pika-spark-bno085-driver && cd pika-spark-bno085-driver
+git clone https://github.com/pika-spark/pika-spark-bno085-driver && cd pika-spark-bno085-driver/docker
 ./docker-build.sh
 sudo ./docker-run.sh
 ```
