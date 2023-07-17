@@ -29,6 +29,9 @@ public:
   BNO085(std::shared_ptr<SPI> const spi);
 
 
+  int begin();
+
+
   int readProductIds(sh2_ProductIds_t * prod_ids);
 
 
@@ -45,4 +48,5 @@ private:
   sh2_Hal_t _sh2_hal;
 
   void init();
+  int  open();
 };

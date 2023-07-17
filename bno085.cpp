@@ -40,6 +40,14 @@ BNO085::BNO085(std::shared_ptr<SPI> const spi)
  * PUBLIC MEMBER FUNCTIONS
  **************************************************************************************/
 
+int BNO085::begin()
+{
+  if (auto const rc = open(); rc != SH2_OK)
+    return rc;
+
+  return SH2_OK;
+}
+
 int BNO085::readProductIds(sh2_ProductIds_t * prod_ids)
 {
   memset(prod_ids, 0, sizeof(sh2_ProductIds_t));
@@ -97,6 +105,11 @@ void BNO085::init()
   _sh2_hal.read      = priv_sh2_hal_read;
   _sh2_hal.write     = priv_sh2_hal_write;
   _sh2_hal.getTimeUs = priv_sh2_hal_getTimeUs;
+}
+
+int BNO085::open()
+{
+  return sh2_open(&_sh2_hal, nullptr, nullptr);
 }
 
 /**************************************************************************************
