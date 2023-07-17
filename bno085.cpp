@@ -40,6 +40,12 @@ BNO085::BNO085(std::shared_ptr<SPI> const spi)
  * PUBLIC MEMBER FUNCTIONS
  **************************************************************************************/
 
+int BNO085::readProductIds(sh2_ProductIds_t * prod_ids)
+{
+  memset(prod_ids, 0, sizeof(sh2_ProductIds_t));
+  return sh2_getProdIds(prod_ids);
+}
+
 int BNO085::sh2_hal_read(uint8_t * pBuffer, unsigned len, uint32_t * /* t_us */)
 {
   /* Read the sensor hub header. */

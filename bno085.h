@@ -15,6 +15,7 @@
 #include <memory>
 
 #include <sh2.h>
+#include <sh2_err.h>
 
 #include "spi.h"
 
@@ -26,6 +27,10 @@ class BNO085
 {
 public:
   BNO085(std::shared_ptr<SPI> const spi);
+
+
+  int readProductIds(sh2_ProductIds_t * prod_ids);
+
 
   /* Do not publicly use those functions.
    * They are used for the sensor hub HAL.
