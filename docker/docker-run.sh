@@ -18,13 +18,13 @@ GPIO_NBOOT_NUM=87
 function finish {
   echo $GPIO_NIRQ_NUM > /sys/class/gpio/unexport
   echo $GPIO_NRST_NUM > /sys/class/gpio/unexport
-  echo GPIO_NBOOT_NUM > /sys/class/gpio/unexport
+  echo $GPIO_NBOOT_NUM > /sys/class/gpio/unexport
 }
 trap finish EXIT
 
 echo $GPIO_NIRQ_NUM > /sys/class/gpio/export
 echo $GPIO_NRST_NUM > /sys/class/gpio/export
-echo GPIO_NBOOT_NUM > /sys/class/gpio/export
+echo $GPIO_NBOOT_NUM > /sys/class/gpio/export
 
 modprobe spidev
 chmod ugo+rw /dev/spidev1.0
