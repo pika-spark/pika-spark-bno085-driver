@@ -51,6 +51,7 @@ int main(int /* argc */, char ** /* argv */) try
 
   auto const gpio_nirq = std::make_shared<SysGPIO>(nIRQ_PIN);
   gpio_nirq->gpio_set_dir(false);
+  gpio_nirq->gpio_set_edge("falling");
 
   auto const arvrStabilizedRV_callback = [](sh2_RotationVectorWAcc_t const & data)
   {
@@ -101,7 +102,16 @@ int main(int /* argc */, char ** /* argv */) try
    * the sensor hub.
    */
   for (;;)
-    bno085->spinOnce();
+  {
+    auto const rc_poll = gpio_nirq->gpio_poll(gpio_nirq->gpio_fd_open(), 1000);
+
+    if      (rc_poll < 0)
+      throw BNO085_Exception("poll(gpio_nirq) failed with error code %d", rc_poll);
+    else if (rc_poll == 0)
+      std::cout << "poll(gpio_nirq) timed out." << std::endl;
+    else
+      bno085->spinOnce();
+  }
 
   return EXIT_SUCCESS;
 }
