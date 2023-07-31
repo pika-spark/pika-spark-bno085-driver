@@ -40,6 +40,10 @@ public:
   int readProductIds(sh2_ProductIds_t * prod_ids);
   int config();
 
+
+  void spinOnce();
+
+
   /* Do not publicly use those functions.
    * They are used for the sensor hub HAL.
    */

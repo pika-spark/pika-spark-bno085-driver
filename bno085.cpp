@@ -88,6 +88,11 @@ int BNO085::config()
   return sh2_setSensorConfig(SH2_ARVR_STABILIZED_RV, &bno085_config);
 }
 
+void BNO085::spinOnce()
+{
+  sh2_service();
+}
+
 int BNO085::sh2_hal_read(uint8_t * pBuffer, unsigned len, uint32_t * /* t_us */)
 {
   /* Read the sensor hub header. */

@@ -95,6 +95,12 @@ int main(int /* argc */, char ** /* argv */) try
     return EXIT_FAILURE;
   }
 
+  /* Run until killed by Ctrl+C to service
+   * the sensor hub.
+   */
+  for (;;)
+    bno085->spinOnce();
+
   return EXIT_SUCCESS;
 }
 catch (std::runtime_error const & err)
