@@ -116,13 +116,14 @@ int BNO085::sh2_hal_read(uint8_t * pBuffer, unsigned len, uint32_t * /* t_us */)
     return 0;
 
   /* Ensure that we only transmit zero's. */
-  memset(pBuffer, 0, packet_size);
+  auto const tx_buf = std::make_unique<uint8_t[]>(packet_size);
+  memset(tx_buf.get(), 0, packet_size);
 
   if (!waitForIrqLow())
     return 0;
 
   /* Transmit zero's and read from the device. */
-  if (!_spi->transfer(pBuffer, pBuffer, packet_size))
+  if (!_spi->transfer(tx_buf.get(), pBuffer, packet_size))
     return 0;
 
   return packet_size;
@@ -133,7 +134,10 @@ int BNO085::sh2_hal_write(uint8_t * pBuffer, unsigned len)
   if (!waitForIrqLow())
     return 0;
 
-  if (!_spi->transfer(pBuffer, pBuffer, len))
+  auto const tx_buf = std::make_unique<uint8_t[]>(len);
+  memcpy(tx_buf.get(), pBuffer, len);
+
+  if (!_spi->transfer(tx_buf.get(), pBuffer, len))
     return 0;
 
   return len;
