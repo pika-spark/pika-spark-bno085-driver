@@ -62,5 +62,5 @@ private:
   std::chrono::steady_clock::time_point const _start;
   sh2_Hal_t _sh2_hal;
 
-  bool waitForIrqLow(const std::chrono::milliseconds timeout = std::chrono::milliseconds(125));
+  bool waitForIrqLow(std::chrono::milliseconds const timeout = std::chrono::milliseconds(125));
 };

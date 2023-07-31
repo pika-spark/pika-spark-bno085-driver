@@ -211,10 +211,10 @@ void BNO085::sh2_sensor_callback(sh2_SensorEvent_t * event)
  * PRIVATE MEMBER FUNCTIONS
  **************************************************************************************/
 
-bool BNO085::waitForIrqLow(const std::chrono::milliseconds timeout)
+bool BNO085::waitForIrqLow(std::chrono::milliseconds const timeout)
 {
   for (auto const start = std::chrono::steady_clock::now();
-       (std::chrono::steady_clock::now() - start) < timeout;
+       std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - start) < timeout;
        )
   {
     unsigned int nirq_value = 1;
