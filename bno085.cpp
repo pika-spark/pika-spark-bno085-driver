@@ -13,6 +13,8 @@
 
 #include <cstring>
 
+#include <stdexcept>
+
 /**************************************************************************************
  * PRIVATE FUNCTION DECLARATIONS
  **************************************************************************************/
@@ -27,8 +29,10 @@ static uint32_t priv_sh2_hal_getTimeUs(sh2_Hal_t * self);
  * CTOR/DTOR
  **************************************************************************************/
 
-BNO085::BNO085(std::shared_ptr<SPI> const spi)
+BNO085::BNO085(std::shared_ptr<SPI> const spi,
+               std::shared_ptr<SysGPIO> const nirq)
 : _spi{spi}
+, _nirq{nirq}
 , _start{std::chrono::steady_clock::now()}
 {
   _sh2_hal.user_reference = reinterpret_cast<void *>(this);
@@ -112,6 +116,27 @@ void BNO085::init()
 int BNO085::open()
 {
   return sh2_open(&_sh2_hal, nullptr, nullptr);
+}
+
+bool BNO085::waitForIrq(std::chrono::milliseconds const timeout)
+{
+  for (auto const start = std::chrono::steady_clock::now();
+       (std::chrono::steady_clock::now() - start) < timeout;
+       )
+  {
+    unsigned int nirq_value = 1;
+
+    if (auto const rc = _nirq->gpio_get_value(nirq_value); rc != 0)
+      throw std::runtime_error("BNO085::waitForIrq(...) nirq->gpio_get_value(...) failed");
+
+    if (nirq_value == 0)
+      return true;
+  }
+
+  /* A timeout has occured, nIRQ has not been set to LOW within
+   * "timeout" milliseconds since the first call to this function.
+   */
+  return false;
 }
 
 /**************************************************************************************

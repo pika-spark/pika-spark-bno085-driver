@@ -18,6 +18,7 @@
 #include <sh2_err.h>
 
 #include "spi.h"
+#include "gpio-sysfs.h"
 
 /**************************************************************************************
  * CLASS DECLARATION
@@ -26,7 +27,8 @@
 class BNO085
 {
 public:
-  BNO085(std::shared_ptr<SPI> const spi);
+  BNO085(std::shared_ptr<SPI> const spi,
+         std::shared_ptr<SysGPIO> const nirq);
 
 
   int begin();
@@ -44,9 +46,11 @@ public:
 
 private:
   std::shared_ptr<SPI> const _spi;
+  std::shared_ptr<SysGPIO> const _nirq;
   std::chrono::steady_clock::time_point const _start;
   sh2_Hal_t _sh2_hal;
 
   void init();
   int  open();
+  bool waitForIrq(std::chrono::milliseconds const timeout = std::chrono::milliseconds(125));
 };
