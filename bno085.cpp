@@ -25,6 +25,8 @@ static int      priv_sh2_hal_read     (sh2_Hal_t * self, uint8_t * pBuffer, unsi
 static int      priv_sh2_hal_write    (sh2_Hal_t * self, uint8_t * pBuffer, unsigned len);
 static uint32_t priv_sh2_hal_getTimeUs(sh2_Hal_t * self);
 
+static void     priv_sh2_hal_callback (void * cookie, sh2_AsyncEvent_t * event);
+
 /**************************************************************************************
  * CTOR/DTOR
  **************************************************************************************/
@@ -114,6 +116,11 @@ uint32_t BNO085::sh2_hal_getTimeUs()
   return std::chrono::duration_cast<std::chrono::microseconds>(uptime).count();
 }
 
+void BNO085::sh2_hal_callback(sh2_AsyncEvent_t * /* event */)
+{
+  throw std::runtime_error("unhandled hal event occured");
+}
+
 /**************************************************************************************
  * PRIVATE MEMBER FUNCTIONS
  **************************************************************************************/
@@ -129,7 +136,7 @@ void BNO085::init()
 
 int BNO085::open()
 {
-  return sh2_open(&_sh2_hal, nullptr, nullptr);
+  return sh2_open(&_sh2_hal, priv_sh2_hal_callback, reinterpret_cast<void *>(this));
 }
 
 bool BNO085::waitForIrqLow(const std::chrono::milliseconds timeout)
@@ -183,4 +190,10 @@ uint32_t priv_sh2_hal_getTimeUs(sh2_Hal_t * self)
 {
   BNO085 * this_ptr = reinterpret_cast<BNO085 *>(self->user_reference);
   return this_ptr->sh2_hal_getTimeUs();
+}
+
+void priv_sh2_hal_callback (void * cookie, sh2_AsyncEvent_t * event)
+{
+  BNO085 * this_ptr = reinterpret_cast<BNO085 *>(cookie);
+  this_ptr->sh2_hal_callback (event);
 }

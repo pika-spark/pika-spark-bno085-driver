@@ -42,6 +42,8 @@ public:
   int      sh2_hal_write    (uint8_t * pBuffer, unsigned len);
   uint32_t sh2_hal_getTimeUs();
 
+  void     sh2_hal_callback (sh2_AsyncEvent_t * event);
+
 private:
   std::shared_ptr<SPI> const _spi;
   std::shared_ptr<SysGPIO> const _nirq;
