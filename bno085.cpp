@@ -58,6 +58,11 @@ int BNO085::readProductIds(sh2_ProductIds_t * prod_ids)
   return sh2_getProdIds(prod_ids);
 }
 
+int BNO085::config(sh2_SensorId_t const sensor_id, sh2_SensorConfig_t const & sensor_config)
+{
+  return sh2_setSensorConfig(sensor_id, &sensor_config);
+}
+
 int BNO085::sh2_hal_read(uint8_t * pBuffer, unsigned len, uint32_t * /* t_us */)
 {
   /* Read the sensor hub header. */
