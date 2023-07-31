@@ -13,6 +13,8 @@
 
 #include <cstring>
 
+#include <iostream>
+
 #include "bno085_exception.h"
 
 /**************************************************************************************
@@ -146,7 +148,48 @@ uint32_t BNO085::sh2_hal_getTimeUs()
 
 void BNO085::sh2_hal_callback(sh2_AsyncEvent_t * event)
 {
-  throw BNO085_Exception("unhandled hal event occurred, eventId = %d", event->eventId);
+  auto const toErrStr =[](sh2_ShtpEvent_t const evt)
+  {
+    switch(evt)
+    {
+      case SH2_SHTP_TX_DISCARD:
+        return std::string_view("SH2_SHTP_TX_DISCARD");
+        break;
+      case SH2_SHTP_SHORT_FRAGMENT:
+        return std::string_view("SH2_SHTP_SHORT_FRAGMENT");
+        break;
+      case SH2_SHTP_TOO_LARGE_PAYLOADS:
+        return std::string_view("SH2_SHTP_TOO_LARGE_PAYLOADS");
+        break;
+      case SH2_SHTP_BAD_RX_CHAN:
+        return std::string_view("SH2_SHTP_BAD_RX_CHAN");
+        break;
+      case SH2_SHTP_BAD_TX_CHAN:
+        return std::string_view("SH2_SHTP_BAD_TX_CHAN");
+        break;
+      case SH2_SHTP_BAD_FRAGMENT:
+        return std::string_view("SH2_SHTP_BAD_FRAGMENT");
+        break;
+      case SH2_SHTP_BAD_SN:
+        return std::string_view("SH2_SHTP_BAD_SN");
+        break;
+      case SH2_SHTP_INTERRUPTED_PAYLOAD:
+        return std::string_view("SH2_SHTP_INTERRUPTED_PAYLOAD");
+        break;
+      default:
+        __builtin_unreachable();
+        break;
+    }
+  };
+
+  if (event->eventId == SH2_RESET)
+    std::cerr << "BNO085::sh2_hal_callback(...) reset has occured" << std::endl;
+  else if (event->eventId == SH2_SHTP_EVENT)
+    std::cerr << "BNO085::sh2_hal_callback(...) SHTP error has occured: \"" << toErrStr(event->shtpEvent) << "\"" << std::endl;
+  else if (event->eventId == SH2_GET_FEATURE_RESP)
+    std::cerr << "BNO085::sh2_hal_callback(...) get feature response received" << std::endl;
+  else
+    throw BNO085_Exception("BNO085::sh2_hal_callback(...) unhandled hal event occurred, eventId = %d", event->eventId);
 }
 
 void BNO085::sh2_sensor_callback(sh2_SensorEvent_t * event)
