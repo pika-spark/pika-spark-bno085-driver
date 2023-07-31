@@ -13,9 +13,11 @@
 
 #include <chrono>
 #include <memory>
+#include <functional>
 
 #include <sh2.h>
 #include <sh2_err.h>
+#include <sh2_SensorValue.h>
 
 #include "spi.h"
 #include "gpio-sysfs.h"
@@ -27,8 +29,11 @@
 class BNO085
 {
 public:
+  typedef std::function<void(sh2_RotationVectorWAcc_t const &)> StabilizedRotationVectorWAccuracyCallbackFunc;
+
   BNO085(std::shared_ptr<SPI> const spi,
-         std::shared_ptr<SysGPIO> const nirq);
+         std::shared_ptr<SysGPIO> const nirq,
+         StabilizedRotationVectorWAccuracyCallbackFunc const sensor_func);
 
 
   int begin();
@@ -42,15 +47,16 @@ public:
   int      sh2_hal_write    (uint8_t * pBuffer, unsigned len);
   uint32_t sh2_hal_getTimeUs();
 
-  void     sh2_hal_callback (sh2_AsyncEvent_t * event);
+  void     sh2_hal_callback   (sh2_AsyncEvent_t * event);
+  void     sh2_sensor_callback(sh2_SensorEvent_t * event);
+
 
 private:
   std::shared_ptr<SPI> const _spi;
   std::shared_ptr<SysGPIO> const _nirq;
+  StabilizedRotationVectorWAccuracyCallbackFunc const _sensor_func;
   std::chrono::steady_clock::time_point const _start;
   sh2_Hal_t _sh2_hal;
 
-  void init();
-  int  open();
   bool waitForIrqLow(const std::chrono::milliseconds timeout = std::chrono::milliseconds(125));
 };

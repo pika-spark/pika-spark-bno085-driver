@@ -25,21 +25,28 @@ static int      priv_sh2_hal_read     (sh2_Hal_t * self, uint8_t * pBuffer, unsi
 static int      priv_sh2_hal_write    (sh2_Hal_t * self, uint8_t * pBuffer, unsigned len);
 static uint32_t priv_sh2_hal_getTimeUs(sh2_Hal_t * self);
 
-static void     priv_sh2_hal_callback (void * cookie, sh2_AsyncEvent_t * event);
+static void     priv_sh2_hal_callback   (void * cookie, sh2_AsyncEvent_t * event);
+static void     priv_sh2_sensor_callback(void * cookie, sh2_SensorEvent_t * event);
 
 /**************************************************************************************
  * CTOR/DTOR
  **************************************************************************************/
 
 BNO085::BNO085(std::shared_ptr<SPI> const spi,
-               std::shared_ptr<SysGPIO> const nirq)
+               std::shared_ptr<SysGPIO> const nirq,
+               StabilizedRotationVectorWAccuracyCallbackFunc const sensor_func)
 : _spi{spi}
 , _nirq{nirq}
+, _sensor_func{sensor_func}
 , _start{std::chrono::steady_clock::now()}
 {
   _sh2_hal.user_reference = reinterpret_cast<void *>(this);
 
-  init();
+  _sh2_hal.open      = priv_sh2_hal_open;
+  _sh2_hal.close     = priv_sh2_hal_close;
+  _sh2_hal.read      = priv_sh2_hal_read;
+  _sh2_hal.write     = priv_sh2_hal_write;
+  _sh2_hal.getTimeUs = priv_sh2_hal_getTimeUs;
 }
 
 /**************************************************************************************
@@ -48,7 +55,10 @@ BNO085::BNO085(std::shared_ptr<SPI> const spi,
 
 int BNO085::begin()
 {
-  if (auto const rc = open(); rc != SH2_OK)
+  if (auto const rc = sh2_open(&_sh2_hal, priv_sh2_hal_callback, reinterpret_cast<void *>(this)); rc != SH2_OK)
+    return rc;
+
+  if (auto const rc = sh2_setSensorCallback(priv_sh2_sensor_callback, reinterpret_cast<void *>(this)); rc != SH2_OK)
     return rc;
 
   return SH2_OK;
@@ -134,23 +144,24 @@ void BNO085::sh2_hal_callback(sh2_AsyncEvent_t * event)
   throw BNO085_Exception("unhandled hal event occurred, eventId = %d", event->eventId);
 }
 
+void BNO085::sh2_sensor_callback(sh2_SensorEvent_t * event)
+{
+  sh2_SensorValue_t sensor_value;
+
+  if (auto const rc = sh2_decodeSensorEvent(&sensor_value, event); rc != SH2_OK)
+    throw BNO085_Exception("error decoding sensor event, rc = %d", rc);
+
+  if (sensor_value.sensorId == SH2_ARVR_STABILIZED_RV) {
+    if (_sensor_func)
+      _sensor_func(sensor_value.un.arvrStabilizedRV);
+  }
+  else
+    throw BNO085_Exception("unhandled sensor event decoded, sensorId = %d", sensor_value.sensorId);
+}
+
 /**************************************************************************************
  * PRIVATE MEMBER FUNCTIONS
  **************************************************************************************/
-
-void BNO085::init()
-{
-  _sh2_hal.open      = priv_sh2_hal_open;
-  _sh2_hal.close     = priv_sh2_hal_close;
-  _sh2_hal.read      = priv_sh2_hal_read;
-  _sh2_hal.write     = priv_sh2_hal_write;
-  _sh2_hal.getTimeUs = priv_sh2_hal_getTimeUs;
-}
-
-int BNO085::open()
-{
-  return sh2_open(&_sh2_hal, priv_sh2_hal_callback, reinterpret_cast<void *>(this));
-}
 
 bool BNO085::waitForIrqLow(const std::chrono::milliseconds timeout)
 {
@@ -208,5 +219,11 @@ uint32_t priv_sh2_hal_getTimeUs(sh2_Hal_t * self)
 void priv_sh2_hal_callback (void * cookie, sh2_AsyncEvent_t * event)
 {
   BNO085 * this_ptr = reinterpret_cast<BNO085 *>(cookie);
-  this_ptr->sh2_hal_callback (event);
+  this_ptr->sh2_hal_callback(event);
+}
+
+void priv_sh2_sensor_callback(void * cookie, sh2_SensorEvent_t * event)
+{
+  BNO085 * this_ptr = reinterpret_cast<BNO085 *>(cookie);
+  this_ptr->sh2_sensor_callback(event);
 }

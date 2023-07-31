@@ -50,8 +50,22 @@ int main(int /* argc */, char ** /* argv */) try
   auto const gpio_nirq = std::make_shared<SysGPIO>(nIRQ_PIN);
   gpio_nirq->gpio_set_dir(false);
 
+  auto const arvrStabilizedRV_callback = [](sh2_RotationVectorWAcc_t const & data)
+  {
+    char msg[128] = {0};
+    snprintf(msg,
+             sizeof(msg),
+             "[i, j, k, real, accuracy] = [%0.3f, %0.3f, %0.3f, %0.3f, %0.3f]",
+             data.i,
+             data.j,
+             data.k,
+             data.real,
+             data.accuracy);
+    std::cout << msg << std::endl;
+  };
+
   auto spi = std::make_shared<SPI>("/dev/spidev0.0", SPI_MODE_3, 8, 1*1000*1000UL);
-  auto bno085 = std::make_shared<BNO085>(spi, gpio_nirq);
+  auto bno085 = std::make_shared<BNO085>(spi, gpio_nirq, arvrStabilizedRV_callback);
 
   if (auto const rc = bno085->begin(); rc != SH2_OK) {
     std::cerr << "begin failed with error code " << rc << std::endl;
