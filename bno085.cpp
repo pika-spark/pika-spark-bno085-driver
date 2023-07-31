@@ -183,9 +183,9 @@ void BNO085::sh2_hal_callback(sh2_AsyncEvent_t * event)
   };
 
   if (event->eventId == SH2_RESET)
-    std::cerr << "BNO085::sh2_hal_callback(...) reset has occured" << std::endl;
+    std::cerr << "BNO085::sh2_hal_callback(...) reset has occurred" << std::endl;
   else if (event->eventId == SH2_SHTP_EVENT)
-    std::cerr << "BNO085::sh2_hal_callback(...) SHTP error has occured: \"" << SHTPEventToErrStr(event->shtpEvent) << "\"" << std::endl;
+    std::cerr << "BNO085::sh2_hal_callback(...) SHTP error has occurred: \"" << SHTPEventToErrStr(event->shtpEvent) << "\"" << std::endl;
   else if (event->eventId == SH2_GET_FEATURE_RESP)
     std::cerr << "BNO085::sh2_hal_callback(...) get feature response received" << std::endl;
   else
