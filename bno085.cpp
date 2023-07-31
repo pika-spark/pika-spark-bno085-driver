@@ -64,6 +64,9 @@ int BNO085::sh2_hal_read(uint8_t * pBuffer, unsigned len, uint32_t * /* t_us */)
   uint8_t       sh_hdr_rx_buf[4] = {0};
   uint8_t const sh_hdr_tx_buf[4] = {0};
 
+  if (!waitForIrq())
+    return 0;
+
   if (!_spi->transfer(sh_hdr_tx_buf, sh_hdr_rx_buf, sizeof(sh_hdr_tx_buf)))
     return 0;
 
@@ -78,6 +81,9 @@ int BNO085::sh2_hal_read(uint8_t * pBuffer, unsigned len, uint32_t * /* t_us */)
   /* Ensure that we only transmit zero's. */
   memset(pBuffer, 0, packet_size);
 
+  if (!waitForIrq())
+    return 0;
+
   /* Transmit zero's and read from the device. */
   if (!_spi->transfer(pBuffer, pBuffer, packet_size))
     return 0;
@@ -87,6 +93,9 @@ int BNO085::sh2_hal_read(uint8_t * pBuffer, unsigned len, uint32_t * /* t_us */)
 
 int BNO085::sh2_hal_write(uint8_t * pBuffer, unsigned len)
 {
+  if (!waitForIrq())
+    return 0;
+
   if (!_spi->transfer(pBuffer, pBuffer, len))
     return 0;
 
