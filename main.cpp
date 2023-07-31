@@ -83,8 +83,8 @@ int main(int /* argc */, char ** /* argv */) try
   for (size_t i = 0; i < prod_ids.numEntries; i++)
   {
     std::cout << "Entry " << (i + 1) << " of " << static_cast<int>(prod_ids.numEntries) << std::endl;
-    std::cout << "\tswVersionMajor = " << prod_ids.entry[i].swVersionMajor << std::endl
-              << "\tswVersionMinor = " << prod_ids.entry[i].swVersionMinor << std::endl
+    std::cout << "\tswVersionMajor = " << static_cast<int>(prod_ids.entry[i].swVersionMajor) << std::endl
+              << "\tswVersionMinor = " << static_cast<int>(prod_ids.entry[i].swVersionMinor) << std::endl
               << "\tswPartNumber   = " << prod_ids.entry[i].swPartNumber   << std::endl
               << "\tswBuildNumber  = " << prod_ids.entry[i].swBuildNumber  << std::endl
               << "\tswVersionPatch = " << prod_ids.entry[i].swVersionPatch << std::endl;
