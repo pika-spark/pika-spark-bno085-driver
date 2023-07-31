@@ -76,20 +76,7 @@ int main(int /* argc */, char ** /* argv */) try
   /* Configure sensor for obtaining current orientation
    * as a quaternion with accuracy estimation.
    */
-  sh2_SensorConfig_t const bno085_config =
-  {
-    /* .changeSensitivityEnabled  = */ false,
-    /* .changeSensitivityRelative = */ false,
-    /* .wakeupEnabled             = */ false,
-    /* .alwaysOnEnabled           = */ false,
-    /* .sniffEnabled              = */ false,
-    /* .changeSensitivity         = */ 0,
-    /* .reportInterval_us         = */ 5000, /* 200 Hz */
-    /* .batchInterval_us          = */ 0,
-    /* .sensorSpecific            = */ 0
-  };
-
-  if (auto const rc = bno085->config(SH2_ARVR_STABILIZED_RV, bno085_config); rc != SH2_OK) {
+  if (auto const rc = bno085->config(); rc != SH2_OK) {
     std::cerr << "config failed with error code " << rc << std::endl;
     return EXIT_FAILURE;
   }

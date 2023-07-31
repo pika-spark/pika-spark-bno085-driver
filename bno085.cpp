@@ -60,9 +60,22 @@ int BNO085::readProductIds(sh2_ProductIds_t * prod_ids)
   return sh2_getProdIds(prod_ids);
 }
 
-int BNO085::config(sh2_SensorId_t const sensor_id, sh2_SensorConfig_t const & sensor_config)
+int BNO085::config()
 {
-  return sh2_setSensorConfig(sensor_id, &sensor_config);
+  sh2_SensorConfig_t const bno085_config =
+    {
+      /* .changeSensitivityEnabled  = */ false,
+      /* .changeSensitivityRelative = */ false,
+      /* .wakeupEnabled             = */ false,
+      /* .alwaysOnEnabled           = */ false,
+      /* .sniffEnabled              = */ false,
+      /* .changeSensitivity         = */ 0,
+      /* .reportInterval_us         = */ 5000, /* 200 Hz */
+      /* .batchInterval_us          = */ 0,
+      /* .sensorSpecific            = */ 0
+    };
+
+  return sh2_setSensorConfig(SH2_ARVR_STABILIZED_RV, &bno085_config);
 }
 
 int BNO085::sh2_hal_read(uint8_t * pBuffer, unsigned len, uint32_t * /* t_us */)

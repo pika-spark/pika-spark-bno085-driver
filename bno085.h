@@ -33,7 +33,7 @@ public:
 
   int begin();
   int readProductIds(sh2_ProductIds_t * prod_ids);
-  int config(sh2_SensorId_t const sensor_id, sh2_SensorConfig_t const & sensor_config);
+  int config();
 
   /* Do not publicly use those functions.
    * They are used for the sensor hub HAL.
