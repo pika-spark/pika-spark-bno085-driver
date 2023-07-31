@@ -52,5 +52,5 @@ private:
 
   void init();
   int  open();
-  bool waitForIrq(std::chrono::milliseconds const timeout = std::chrono::milliseconds(125));
+  bool waitForIrqLow(const std::chrono::milliseconds timeout = std::chrono::milliseconds(125));
 };

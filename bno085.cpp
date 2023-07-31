@@ -64,7 +64,7 @@ int BNO085::sh2_hal_read(uint8_t * pBuffer, unsigned len, uint32_t * /* t_us */)
   uint8_t       sh_hdr_rx_buf[4] = {0};
   uint8_t const sh_hdr_tx_buf[4] = {0};
 
-  if (!waitForIrq())
+  if (!waitForIrqLow())
     return 0;
 
   if (!_spi->transfer(sh_hdr_tx_buf, sh_hdr_rx_buf, sizeof(sh_hdr_tx_buf)))
@@ -81,7 +81,7 @@ int BNO085::sh2_hal_read(uint8_t * pBuffer, unsigned len, uint32_t * /* t_us */)
   /* Ensure that we only transmit zero's. */
   memset(pBuffer, 0, packet_size);
 
-  if (!waitForIrq())
+  if (!waitForIrqLow())
     return 0;
 
   /* Transmit zero's and read from the device. */
@@ -93,7 +93,7 @@ int BNO085::sh2_hal_read(uint8_t * pBuffer, unsigned len, uint32_t * /* t_us */)
 
 int BNO085::sh2_hal_write(uint8_t * pBuffer, unsigned len)
 {
-  if (!waitForIrq())
+  if (!waitForIrqLow())
     return 0;
 
   if (!_spi->transfer(pBuffer, pBuffer, len))
@@ -127,7 +127,7 @@ int BNO085::open()
   return sh2_open(&_sh2_hal, nullptr, nullptr);
 }
 
-bool BNO085::waitForIrq(std::chrono::milliseconds const timeout)
+bool BNO085::waitForIrqLow(const std::chrono::milliseconds timeout)
 {
   for (auto const start = std::chrono::steady_clock::now();
        (std::chrono::steady_clock::now() - start) < timeout;
@@ -136,7 +136,7 @@ bool BNO085::waitForIrq(std::chrono::milliseconds const timeout)
     unsigned int nirq_value = 1;
 
     if (auto const rc = _nirq->gpio_get_value(nirq_value); rc != 0)
-      throw std::runtime_error("BNO085::waitForIrq(...) nirq->gpio_get_value(...) failed");
+      throw std::runtime_error("BNO085::waitForIrqLow(...) nirq->gpio_get_value(...) failed");
 
     if (nirq_value == 0)
       return true;
