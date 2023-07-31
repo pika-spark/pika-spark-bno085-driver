@@ -13,7 +13,7 @@
 
 #include <cstring>
 
-#include <stdexcept>
+#include "bno085_exception.h"
 
 /**************************************************************************************
  * PRIVATE FUNCTION DECLARATIONS
@@ -116,9 +116,9 @@ uint32_t BNO085::sh2_hal_getTimeUs()
   return std::chrono::duration_cast<std::chrono::microseconds>(uptime).count();
 }
 
-void BNO085::sh2_hal_callback(sh2_AsyncEvent_t * /* event */)
+void BNO085::sh2_hal_callback(sh2_AsyncEvent_t * event)
 {
-  throw std::runtime_error("unhandled hal event occured");
+  throw BNO085_Exception("unhandled hal event occurred, eventId = %d", event->eventId);
 }
 
 /**************************************************************************************
@@ -148,7 +148,7 @@ bool BNO085::waitForIrqLow(const std::chrono::milliseconds timeout)
     unsigned int nirq_value = 1;
 
     if (auto const rc = _nirq->gpio_get_value(nirq_value); rc != 0)
-      throw std::runtime_error("BNO085::waitForIrqLow(...) nirq->gpio_get_value(...) failed");
+      throw BNO085_Exception("BNO085::waitForIrqLow(...) nirq->gpio_get_value(...) failed with error code %d", rc);
 
     if (nirq_value == 0)
       return true;
