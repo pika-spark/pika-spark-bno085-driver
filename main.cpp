@@ -18,8 +18,10 @@
 #include <stdexcept>
 
 #include "spi.h"
-#include "bno085.h"
 #include "gpio-sysfs.h"
+
+#include "bno085.h"
+#include "bno085_exception.h"
 
 /**************************************************************************************
  * CONSTANT
@@ -102,6 +104,12 @@ int main(int /* argc */, char ** /* argv */) try
     bno085->spinOnce();
 
   return EXIT_SUCCESS;
+}
+catch (BNO085_Exception const & err)
+{
+  std::cerr << "BNO085 exception caught: " << err.what() << std::endl;
+  std::cerr << "Terminating ..." << std::endl;
+  return EXIT_FAILURE;
 }
 catch (std::runtime_error const & err)
 {
