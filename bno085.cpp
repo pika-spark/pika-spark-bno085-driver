@@ -67,16 +67,18 @@ int BNO085::sh2_hal_read(uint8_t * pBuffer, unsigned len, uint32_t * /* t_us */)
   uint16_t const packet_size =
     (static_cast<uint16_t>(sh_hdr_rx_buf[0]) | static_cast<uint16_t>(sh_hdr_rx_buf[1]) << 8) & 0x7FFF;
 
-  size_t const bytes_to_read = std::min(static_cast<size_t>(packet_size), static_cast<size_t>(len));
-
-  /* Ensure that we only transmit zero's. */
-  memset(pBuffer, 0, bytes_to_read);
-
-  /* Transmit zero's and read from the device. */
-  if (!_spi->transfer(pBuffer, pBuffer, bytes_to_read))
+  /* Return early if packet size exceeds provided buffer. */
+  if (packet_size > len)
     return 0;
 
-  return bytes_to_read;
+  /* Ensure that we only transmit zero's. */
+  memset(pBuffer, 0, packet_size);
+
+  /* Transmit zero's and read from the device. */
+  if (!_spi->transfer(pBuffer, pBuffer, packet_size))
+    return 0;
+
+  return packet_size;
 }
 
 int BNO085::sh2_hal_write(uint8_t * pBuffer, unsigned len)
