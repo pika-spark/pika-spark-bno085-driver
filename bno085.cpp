@@ -148,7 +148,7 @@ uint32_t BNO085::sh2_hal_getTimeUs()
 
 void BNO085::sh2_hal_callback(sh2_AsyncEvent_t * event)
 {
-  auto const toErrStr =[](sh2_ShtpEvent_t const evt)
+  auto const SHTPEventToErrStr =[](sh2_ShtpEvent_t const evt)
   {
     switch(evt)
     {
@@ -185,7 +185,7 @@ void BNO085::sh2_hal_callback(sh2_AsyncEvent_t * event)
   if (event->eventId == SH2_RESET)
     std::cerr << "BNO085::sh2_hal_callback(...) reset has occured" << std::endl;
   else if (event->eventId == SH2_SHTP_EVENT)
-    std::cerr << "BNO085::sh2_hal_callback(...) SHTP error has occured: \"" << toErrStr(event->shtpEvent) << "\"" << std::endl;
+    std::cerr << "BNO085::sh2_hal_callback(...) SHTP error has occured: \"" << SHTPEventToErrStr(event->shtpEvent) << "\"" << std::endl;
   else if (event->eventId == SH2_GET_FEATURE_RESP)
     std::cerr << "BNO085::sh2_hal_callback(...) get feature response received" << std::endl;
   else
