@@ -38,6 +38,7 @@ int main(int /* argc */, char ** /* argv */) try
   auto const gpio_nboot = std::make_shared<SysGPIO>(nBOOT_PIN);
   gpio_nboot->gpio_set_dir(true);
   gpio_nboot->gpio_set_value(1); /* Note: setting it to '0' activates bootloader mode. */
+  std::this_thread::sleep_for(std::chrono::milliseconds(100)); /* Ensure that the value of the pin is settled before its sampled during reset. */
 
   auto const gpio_nrst = std::make_shared<SysGPIO>(nRST_PIN);
   gpio_nrst->gpio_set_dir(true);
