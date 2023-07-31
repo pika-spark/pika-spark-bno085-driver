@@ -82,7 +82,7 @@ int main(int /* argc */, char ** /* argv */) try
   }
   for (size_t i = 0; i < prod_ids.numEntries; i++)
   {
-    std::cout << "Entry " << i << " of " << static_cast<int>(prod_ids.numEntries) << std::endl;
+    std::cout << "Entry " << (i + 1) << " of " << static_cast<int>(prod_ids.numEntries) << std::endl;
     std::cout << "\tswVersionMajor = " << prod_ids.entry[i].swVersionMajor << std::endl
               << "\tswVersionMinor = " << prod_ids.entry[i].swVersionMinor << std::endl
               << "\tswPartNumber   = " << prod_ids.entry[i].swPartNumber   << std::endl
