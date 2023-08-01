@@ -56,7 +56,7 @@ BNO085_HAL::BNO085_HAL(std::shared_ptr<SPI> const spi,
  * PUBLIC MEMBER FUNCTIONS
  **************************************************************************************/
 
-int BNO085_HAL::sh2_hal_read(uint8_t * pBuffer, unsigned len, uint32_t * /* t_us */)
+int BNO085_HAL::sh2_hal_read(uint8_t * pBuffer, unsigned len, uint32_t * t_us)
 {
   /* Read the sensor hub header. */
   uint8_t       sh_hdr_rx_buf[4] = {0};
@@ -86,6 +86,8 @@ int BNO085_HAL::sh2_hal_read(uint8_t * pBuffer, unsigned len, uint32_t * /* t_us
   /* Transmit zero's and read from the device. */
   if (!_spi->transfer(tx_buf.get(), pBuffer, packet_size))
     return 0;
+
+  *t_us = sh2_hal_getTimeUs();
 
   return packet_size;
 }
