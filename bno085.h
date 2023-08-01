@@ -32,8 +32,6 @@ public:
   virtual ~BNO085() { }
 
 
-  int  begin();
-  int  readProductIds(sh2_ProductIds_t * prod_ids);
   int  config();
   void spinOnce();
 

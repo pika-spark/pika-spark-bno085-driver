@@ -70,21 +70,6 @@ int main(int /* argc */, char ** /* argv */) try
   auto spi = std::make_shared<SPI>("/dev/spidev0.0", SPI_MODE_3, 8, 1*1000*1000UL);
   auto bno085 = std::make_shared<BNO085>(spi, gpio_nirq, arvrStabilizedRV_callback);
 
-  sh2_ProductIds_t prod_ids;
-  if (auto const rc = bno085->readProductIds(&prod_ids); rc != SH2_OK) {
-    std::cerr << "readProductIds failed with error code " << rc << std::endl;
-    return EXIT_FAILURE;
-  }
-  for (size_t i = 0; i < prod_ids.numEntries; i++)
-  {
-    std::cout << "Entry " << (i + 1) << " of " << static_cast<int>(prod_ids.numEntries) << std::endl;
-    std::cout << "\tswVersionMajor = " << static_cast<int>(prod_ids.entry[i].swVersionMajor) << std::endl
-              << "\tswVersionMinor = " << static_cast<int>(prod_ids.entry[i].swVersionMinor) << std::endl
-              << "\tswPartNumber   = " << prod_ids.entry[i].swPartNumber   << std::endl
-              << "\tswBuildNumber  = " << prod_ids.entry[i].swBuildNumber  << std::endl
-              << "\tswVersionPatch = " << prod_ids.entry[i].swVersionPatch << std::endl;
-  }
-
   /* Configure sensor for obtaining current orientation
    * as a quaternion with accuracy estimation.
    */
