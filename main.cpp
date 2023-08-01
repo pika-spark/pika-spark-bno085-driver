@@ -103,7 +103,9 @@ int main(int /* argc */, char ** /* argv */) try
    */
   for (;;)
   {
-    auto const rc_poll = gpio_nirq->gpio_poll(gpio_nirq->gpio_fd_open(), 1000);
+    auto const gpio_nirq_fd = gpio_nirq->gpio_fd_open();
+    auto const rc_poll = gpio_nirq->gpio_poll(gpio_nirq_fd, 1000);
+    gpio_nirq->gpio_fd_close(gpio_nirq_fd);
 
     if      (rc_poll < 0)
       throw BNO085_Exception("poll(gpio_nirq) failed with error code %d", rc_poll);

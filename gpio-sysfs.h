@@ -98,6 +98,12 @@ class SysGPIO {
   int gpio_fd_open(void) const;
 
   /**
+   * Closes a file descriptor. Necessary to be called after gpio_fd_open and gpio_poll.
+   * \returns The file descriptor
+   **/
+  void gpio_fd_close(int const gpio_fd) const;
+
+  /**
    * Puts the current thread to sleep until a change is detected
    * on the file descriptor. Get the file descriptor
    * by calling gpio_fd_open.

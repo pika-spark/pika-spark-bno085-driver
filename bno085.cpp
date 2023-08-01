@@ -233,7 +233,9 @@ bool BNO085::waitForIrqLow(std::chrono::milliseconds const timeout)
   if (isIrqLow())
     return true;
 
-  auto const rc_poll = _nirq->gpio_poll(_nirq->gpio_fd_open(), timeout.count());
+  auto const gpio_nirq_fd = _nirq->gpio_fd_open();
+  auto const rc_poll = _nirq->gpio_poll(gpio_nirq_fd, timeout.count());
+  _nirq->gpio_fd_close(gpio_nirq_fd);
 
   if      (rc_poll < 0)
     throw BNO085_Exception("poll(gpio_nirq) failed with error code %d", rc_poll);
