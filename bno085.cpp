@@ -217,9 +217,7 @@ void BNO085::sh2_sensor_callback(sh2_SensorEvent_t * event)
 
 bool BNO085::waitForIrqLow(std::chrono::milliseconds const timeout)
 {
-  for (auto const start = std::chrono::steady_clock::now();
-       std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - start) < timeout;
-       )
+  auto const isIrqLow = [this]()
   {
     unsigned int nirq_value = 1;
 
@@ -228,12 +226,21 @@ bool BNO085::waitForIrqLow(std::chrono::milliseconds const timeout)
 
     if (nirq_value == 0)
       return true;
-  }
+    else
+      return false;
+  };
 
-  /* A timeout has occured, nIRQ has not been set to LOW within
-   * "timeout" milliseconds since the first call to this function.
-   */
-  return false;
+  if (isIrqLow())
+    return true;
+
+  auto const rc_poll = _nirq->gpio_poll(_nirq->gpio_fd_open(), timeout.count());
+
+  if      (rc_poll < 0)
+    throw BNO085_Exception("poll(gpio_nirq) failed with error code %d", rc_poll);
+  else if (rc_poll == 0) /* Timeout, but we still check nIRQ one more time. */
+    return isIrqLow();
+  else /* A IO event occurred, let's check nIRQ- */
+    return isIrqLow();
 }
 
 /**************************************************************************************
