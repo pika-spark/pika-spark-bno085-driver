@@ -2,11 +2,16 @@
 # This docker file allows building and running of 10BASE-T1S user space driver for the onsemi NCN26010 SPI-MAC-PHY.
 FROM alpine:3.18
 
-RUN apk add git g++ make cmake linux-headers && \
-    cd /tmp && \
+RUN apk add git g++ make cmake linux-headers
+
+RUN cd /tmp && \
     git clone --recursive https://github.com/pika-spark/pika-spark-bno085-driver && \
     cd pika-spark-bno085-driver && \
     mkdir build && \
     cd build && \
     cmake .. && \
     make
+
+COPY start.sh /
+RUN chmod ugo+x /start.sh
+ENTRYPOINT ["/start.sh"]
