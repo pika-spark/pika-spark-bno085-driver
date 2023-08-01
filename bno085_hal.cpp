@@ -159,7 +159,7 @@ void BNO085_HAL::sh2_hal_callback(sh2_AsyncEvent_t * event)
 
 void BNO085_HAL::sh2_sensor_callback(sh2_SensorEvent_t * event)
 {
-  sh2_sensor_callback(event);
+  internal_sh2_sensor_callback(event);
 }
 
 /**************************************************************************************
