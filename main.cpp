@@ -74,7 +74,7 @@ int main(int /* argc */, char ** /* argv */) try
     std::cout << msg << std::endl;
   };
 
-  auto spi = std::make_shared<SPI>("/dev/spidev0.0", SPI_MODE_3, 8, 1*1000*1000UL);
+  auto spi = std::make_shared<SPI>("/dev/spidev0.0", SPI_MODE_3, 8, 3*1000*1000UL);
   auto bno085 = std::make_shared<BNO085>(spi, gpio_nirq, arvrStabilizedRV_callback);
 
   /* Configure sensor for obtaining current orientation
