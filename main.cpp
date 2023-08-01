@@ -53,12 +53,19 @@ int main(int /* argc */, char ** /* argv */) try
   gpio_nirq->gpio_set_dir(false);
   gpio_nirq->gpio_set_edge("falling");
 
-  auto const arvrStabilizedRV_callback = [](sh2_RotationVectorWAcc_t const & data)
+  auto arvrStabilizedRV_callback_last = std::chrono::steady_clock::now();
+  auto const arvrStabilizedRV_callback = [&arvrStabilizedRV_callback_last](sh2_RotationVectorWAcc_t const & data)
   {
+    auto const now = std::chrono::steady_clock::now();
+    auto const diff_time = (now - arvrStabilizedRV_callback_last);
+    auto const diff_time_ms = std::chrono::duration_cast<std::chrono::microseconds>(diff_time).count();
+    arvrStabilizedRV_callback_last = now;
+
     char msg[128] = {0};
     snprintf(msg,
              sizeof(msg),
-             "[i, j, k, real, accuracy] = [%0.3f, %0.3f, %0.3f, %0.3f, %0.3f]",
+             "[%010ld] [i, j, k, real, accuracy] = [%0.3f, %0.3f, %0.3f, %0.3f, %0.3f]",
+             diff_time_ms,
              data.i,
              data.j,
              data.k,
