@@ -58,14 +58,14 @@ int main(int /* argc */, char ** /* argv */) try
   {
     auto const now = std::chrono::steady_clock::now();
     auto const diff_time = (now - arvrStabilizedRV_callback_last);
-    auto const diff_time_ms = std::chrono::duration_cast<std::chrono::microseconds>(diff_time).count();
+    auto const diff_time_us = std::chrono::duration_cast<std::chrono::microseconds>(diff_time).count();
     arvrStabilizedRV_callback_last = now;
 
     char msg[128] = {0};
     snprintf(msg,
              sizeof(msg),
-             "[%010ld] [i, j, k, real, accuracy] = [%0.3f, %0.3f, %0.3f, %0.3f, %0.3f]",
-             diff_time_ms,
+             "[%4ld] [i, j, k, real, accuracy] = [%0.3f, %0.3f, %0.3f, %0.3f, %0.3f]",
+             diff_time_us,
              data.i,
              data.j,
              data.k,
