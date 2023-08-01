@@ -8,6 +8,7 @@ add_subdirectory(sh2)
 add_executable(${PROJECT_NAME} 
   main.cpp
   bno085.cpp
+  bno085_hal.cpp
   spi.cpp
   gpio-sysfs.cpp
 )
