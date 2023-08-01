@@ -149,14 +149,19 @@ void BNO085_HAL::sh2_hal_callback(sh2_AsyncEvent_t * event)
     }
   };
 
-  if (event->eventId == SH2_RESET)
-    std::cerr << "BNO085_HAL::sh2_hal_callback(...) reset has occurred" << std::endl;
-  else if (event->eventId == SH2_SHTP_EVENT)
-    std::cerr << "BNO085_HAL::sh2_hal_callback(...) SHTP error has occurred: \"" << SHTPEventToErrStr(event->shtpEvent) << "\"" << std::endl;
-  else if (event->eventId == SH2_GET_FEATURE_RESP)
-    std::cerr << "BNO085_HAL::sh2_hal_callback(...) get feature response received" << std::endl;
-  else
+  if (event->eventId == SH2_RESET) {
+    std::cout << "BNO085_HAL::sh2_hal_callback(...) reset has occurred" << std::endl;
+  }
+  else if (event->eventId == SH2_SHTP_EVENT) {
+    if (event->shtpEvent != SH2_SHTP_BAD_SN)
+      std::cerr << "BNO085_HAL::sh2_hal_callback(...) SHTP error has occurred: \"" << SHTPEventToErrStr(event->shtpEvent) << "\"" << std::endl;
+  }
+  else if (event->eventId == SH2_GET_FEATURE_RESP) {
+    std::cerr << "BNO085_HAL::sh2_hal_callback(...) unhandled get feature response received" << std::endl;
+  }
+  else {
     throw BNO085_Exception("BNO085_HAL::sh2_hal_callback(...) unhandled hal event occurred, eventId = %d", event->eventId);
+  }
 }
 
 void BNO085_HAL::sh2_sensor_callback(sh2_SensorEvent_t * event)
