@@ -13,7 +13,7 @@
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
  * 3. All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
+ *    must display the following acknowledgment:
  *    This product includes software developed by the RidgeRun and Bernd Porr.
  * 4. Neither the name of the RidgeRun nor the
  *    names of its contributors may be used to endorse or promote products
@@ -53,7 +53,7 @@ class SysGPIO {
   explicit SysGPIO(unsigned int gpioNumber);
 
   /**
-   * Starts accesss to the GPIO port
+   * Starts access to the GPIO port
    * \returns error code or zero on success
    **/
   int gpio_export(void) const;
