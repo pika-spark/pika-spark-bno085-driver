@@ -58,38 +58,20 @@ BNO085_HAL::BNO085_HAL(std::shared_ptr<SPI> const spi,
 
 int BNO085_HAL::sh2_hal_read(uint8_t * pBuffer, unsigned len, uint32_t * t_us)
 {
-  /* Read the sensor hub header. */
-  uint8_t       sh_hdr_rx_buf[4] = {0};
-  uint8_t const sh_hdr_tx_buf[4] = {0};
-
   if (!waitForIrqLow())
-    return 0;
-
-  if (!_spi->transfer(sh_hdr_tx_buf, sh_hdr_rx_buf, sizeof(sh_hdr_tx_buf)))
-    return 0;
-
-  /* Determine packet size (mask out continuous bit). */
-  uint16_t const packet_size =
-    (static_cast<uint16_t>(sh_hdr_rx_buf[0]) | static_cast<uint16_t>(sh_hdr_rx_buf[1]) << 8) & 0x7FFF;
-
-  /* Return early if packet size exceeds provided buffer. */
-  if (packet_size > len)
     return 0;
 
   /* Ensure that we only transmit zero's. */
-  auto const tx_buf = std::make_unique<uint8_t[]>(packet_size);
-  memset(tx_buf.get(), 0, packet_size);
-
-  if (!waitForIrqLow())
-    return 0;
+  auto const tx_buf = std::make_unique<uint8_t[]>(len);
+  memset(tx_buf.get(), 0, len);
 
   /* Transmit zero's and read from the device. */
-  if (!_spi->transfer(tx_buf.get(), pBuffer, packet_size))
+  if (!_spi->transfer(tx_buf.get(), pBuffer, len))
     return 0;
 
   *t_us = sh2_hal_getTimeUs();
 
-  return packet_size;
+  return len;
 }
 
 int BNO085_HAL::sh2_hal_write(uint8_t * pBuffer, unsigned len)
