@@ -20,6 +20,8 @@
 #include <rclcpp/qos.hpp>
 #include <rclcpp/rclcpp.hpp>
 
+#include <sensor_msgs/msg/imu.hpp>
+
 #include "spi.h"
 #include "gpio-sysfs.h"
 
@@ -44,6 +46,19 @@ int main(int argc, char ** argv) try
 
   auto const node = rclcpp::Node::make_shared("pika_spark_bno085_driver_node");
 
+  rclcpp::QoS imu_qos_profile(rclcpp::KeepLast(1), rmw_qos_profile_sensor_data);
+
+  node->declare_parameter("imu_topic", "joy");
+  auto const imu_topic = node->get_parameter("imu_topic").as_string();
+  auto const imu_topic_deadline = std::chrono::milliseconds(100);
+  auto const imu_topic_liveliness_lease_duration = std::chrono::milliseconds(1000);
+
+  imu_qos_profile.deadline(imu_topic_deadline);
+  imu_qos_profile.liveliness(RMW_QOS_POLICY_LIVELINESS_MANUAL_BY_TOPIC);
+  imu_qos_profile.liveliness_lease_duration(imu_topic_liveliness_lease_duration);
+
+  auto const imu_pub = node->create_publisher<sensor_msgs::msg::Imu>(imu_topic, imu_qos_profile);
+
   auto const gpio_nboot = std::make_shared<SysGPIO>(nBOOT_PIN);
   gpio_nboot->gpio_set_dir(true);
   gpio_nboot->gpio_set_value(1); /* Note: setting it to '0' activates bootloader mode. */
@@ -60,25 +75,20 @@ int main(int argc, char ** argv) try
   gpio_nirq->gpio_set_dir(false);
   gpio_nirq->gpio_set_edge("falling");
 
-  auto arvrStabilizedRV_callback_last = std::chrono::steady_clock::now();
-  auto const arvrStabilizedRV_callback = [&arvrStabilizedRV_callback_last](sh2_RotationVectorWAcc_t const & data)
+  auto const arvrStabilizedRV_callback = [node, imu_pub](sh2_RotationVectorWAcc_t const & data)
   {
-    auto const now = std::chrono::steady_clock::now();
-    auto const diff_time = (now - arvrStabilizedRV_callback_last);
-    auto const diff_time_us = std::chrono::duration_cast<std::chrono::microseconds>(diff_time).count();
-    arvrStabilizedRV_callback_last = now;
+    RCLCPP_INFO(node->get_logger(),
+                "[i, j, k, real, accuracy] = [%0.3f, %0.3f, %0.3f, %0.3f, %0.3f]",
+                data.i, data.j, data.k, data.real, data.accuracy);
 
-    char msg[128] = {0};
-    snprintf(msg,
-             sizeof(msg),
-             "[%4ld] [i, j, k, real, accuracy] = [%0.3f, %0.3f, %0.3f, %0.3f, %0.3f]",
-             diff_time_us,
-             data.i,
-             data.j,
-             data.k,
-             data.real,
-             data.accuracy);
-    std::cout << msg << std::endl;
+    sensor_msgs::msg::Imu imu_msg;
+    imu_msg.header.stamp = node->now();
+    imu_msg.orientation.x = data.i;
+    imu_msg.orientation.y = data.j;
+    imu_msg.orientation.z = data.k;
+    imu_msg.orientation.w = data.real;
+
+    imu_pub->publish(imu_msg);
   };
 
   auto spi = std::make_shared<SPI>("/dev/spidev0.0", SPI_MODE_3, 8, 3*1000*1000UL);
