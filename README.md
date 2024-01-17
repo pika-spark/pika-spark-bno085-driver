@@ -18,3 +18,10 @@ cd $COLCON_WS
 source /opt/ros/humble/setup.bash
 colcon build --packages-select pika_spark_bno085_driver
 ```
+
+#### How-to-run
+```bash
+cd $COLCON_WS
+. install/setup.bash
+ros2 launch pika_spark_bno085_driver imu.py
+```
