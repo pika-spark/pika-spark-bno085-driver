@@ -17,6 +17,9 @@
 #include <iostream>
 #include <stdexcept>
 
+#include <rclcpp/qos.hpp>
+#include <rclcpp/rclcpp.hpp>
+
 #include "spi.h"
 #include "gpio-sysfs.h"
 
@@ -35,8 +38,12 @@ static int constexpr nIRQ_PIN  = 131;
  * MAIN
  **************************************************************************************/
 
-int main(int /* argc */, char ** /* argv */) try
+int main(int argc, char ** argv) try
 {
+  rclcpp::init(argc, argv);
+
+  auto const node = rclcpp::Node::make_shared("pika_spark_bno085_driver_node");
+
   auto const gpio_nboot = std::make_shared<SysGPIO>(nBOOT_PIN);
   gpio_nboot->gpio_set_dir(true);
   gpio_nboot->gpio_set_value(1); /* Note: setting it to '0' activates bootloader mode. */
@@ -85,11 +92,18 @@ int main(int /* argc */, char ** /* argv */) try
     return EXIT_FAILURE;
   }
 
-  /* Run until killed by Ctrl+C to service
-   * the sensor hub.
+  /* Run until killed by Ctrl+C to service the sensor hub.
    */
-  for (;;)
+  RCLCPP_INFO(node->get_logger(), "%s init complete.", node->get_name());
+
+  while (rclcpp::ok())
   {
+    /* Let ROS do its things. */
+    rclcpp::spin_some(node);
+
+    /* Check if an event has been signalled via the
+     * BNO085 nIRQ pin.
+     */
     auto const gpio_nirq_fd = gpio_nirq->gpio_fd_open();
     auto const rc_poll = gpio_nirq->gpio_poll(gpio_nirq_fd, 1000);
     gpio_nirq->gpio_fd_close(gpio_nirq_fd);
@@ -102,6 +116,9 @@ int main(int /* argc */, char ** /* argv */) try
       bno085->spinOnce();
   }
 
+  RCLCPP_INFO(node->get_logger(), "%s shut down.", node->get_name());
+
+  rclcpp::shutdown();
   return EXIT_SUCCESS;
 }
 catch (BNO085_Exception const & err)
