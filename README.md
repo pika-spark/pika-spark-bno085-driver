@@ -12,7 +12,7 @@ Linux user space ROS driver for the [BNO085](https://www.ceva-dsp.com/wp-content
   <a href="https://pika-spark.io/"><img src="https://raw.githubusercontent.com/pika-spark/.github/main/logo/logo-pika-spark-bg-white-github.png" width="40%"></a>
 </p>
 
-### How-to-build
+#### How-to-build
 ```bash
 cd $COLCON_WS/src
 git clone --recursive https://github.com/pika-spark/pika-spark-bno085-driver
