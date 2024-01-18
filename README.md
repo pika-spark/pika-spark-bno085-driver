@@ -6,6 +6,8 @@
 
 Linux user space ROS driver for the [BNO085](https://www.ceva-dsp.com/wp-content/uploads/2019/10/BNO080_085-Datasheet.pdf) 9-DoF IMU.
 
+**Note**: In order to run the BNO085 ROS driver on [Pika Spark](https://pika-spark.io/) take a look at ready-to-use build/run scripts at [pika-spark-container/ros-imu-bno085](https://github.com/pika-spark/pika-spark-containers/tree/main/ros-imu-bno085).
+
 <p align="center">
   <a href="https://pika-spark.io/"><img src="https://raw.githubusercontent.com/pika-spark/.github/main/logo/logo-pika-spark-bg-white-github.png" width="40%"></a>
 </p>
