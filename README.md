@@ -31,5 +31,5 @@ ros2 launch pika_spark_bno085_driver imu.py
 #### How-to-visualize your IMU data
 ```bash
 sudo apt-get install ros-humble-imu-tools
-ros2 run rviz2 rviz2  
+ros2 launch pika_spark_bno085_driver rviz2.py
 ```

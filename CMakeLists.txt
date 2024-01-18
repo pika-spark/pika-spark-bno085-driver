@@ -29,7 +29,7 @@ target_compile_features(${PIKA_SPARK_BNO085_TARGET} PUBLIC cxx_std_17)
 ament_target_dependencies(${PIKA_SPARK_BNO085_TARGET} rclcpp sensor_msgs)
 ##########################################################################
 install(TARGETS ${PIKA_SPARK_BNO085_TARGET} DESTINATION lib/${PROJECT_NAME})
-install(DIRECTORY launch DESTINATION share/${PROJECT_NAME})
+install(DIRECTORY config launch DESTINATION share/${PROJECT_NAME})
 ##########################################################################
 ament_package()
 ##########################################################################
