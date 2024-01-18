@@ -1,0 +1,51 @@
+name: ros2
+
+on:
+  push:
+    paths:
+      - ".github/workflows/ros2.yml"
+      - "include/**"
+      - "launch/**"
+      - "src/**"
+      - "CMakeLists.txt"
+      - "package.xml"
+  pull_request:
+    paths:
+      - ".github/workflows/ros2.yml"
+      - "include/**"
+      - "launch/**"
+      - "src/**"
+      - "CMakeLists.txt"
+      - "package.xml"
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    name: Build on ros2 ${{ matrix.ros_distro }}
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        ros_distro: [ humble ]
+
+    steps:   
+    - uses: ros-tooling/setup-ros@v0.7
+      with:
+        required-ros-distributions: ${{ matrix.ros_distro }}
+    
+    - name: Setup ros2 workspace
+      run: | 
+        mkdir -p ${{github.workspace}}/ros2_ws/src
+
+    - uses: actions/checkout@v4
+      with:
+        path: 'ros2_ws/src/pika-spark-bno085-driver'
+        submodules: true
+        fetch-depth: 1
+
+    - name: colcon build
+      run: |
+        source /opt/ros/${{ matrix.ros_distro }}/setup.bash
+        cd ${{github.workspace}}/ros2_ws
+        colcon build --event-handlers console_direct+
