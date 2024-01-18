@@ -57,6 +57,7 @@ int main(int argc, char ** argv) try
   imu_qos_profile.liveliness(RMW_QOS_POLICY_LIVELINESS_MANUAL_BY_TOPIC);
   imu_qos_profile.liveliness_lease_duration(imu_topic_liveliness_lease_duration);
 
+  sensor_msgs::msg::Imu imu_msg;
   auto const imu_pub = node->create_publisher<sensor_msgs::msg::Imu>(imu_topic, imu_qos_profile);
 
   auto const gpio_nboot = std::make_shared<SysGPIO>(nBOOT_PIN);
@@ -75,13 +76,23 @@ int main(int argc, char ** argv) try
   gpio_nirq->gpio_set_dir(false);
   gpio_nirq->gpio_set_edge("falling");
 
-  auto const arvrStabilizedRV_callback = [node, imu_pub](sh2_RotationVectorWAcc_t const & data)
+  auto const gyro_callback = [node, &imu_msg](sh2_Gyroscope_t const & data)
+  {
+    RCLCPP_INFO(node->get_logger(),
+                "[x, y, z,] = [%0.3f, %0.3f, %0.3f] rad/s",
+                data.x, data.y, data.z);
+
+    imu_msg.angular_velocity.x = data.x;
+    imu_msg.angular_velocity.y = data.y;
+    imu_msg.angular_velocity.z = data.z;
+  };
+
+  auto const attitude_callback = [node, imu_pub, &imu_msg](sh2_RotationVectorWAcc_t const & data)
   {
     RCLCPP_INFO(node->get_logger(),
                 "[i, j, k, real, accuracy] = [%0.3f, %0.3f, %0.3f, %0.3f, %0.3f]",
                 data.i, data.j, data.k, data.real, data.accuracy);
 
-    sensor_msgs::msg::Imu imu_msg;
     imu_msg.header.stamp = node->now();
     imu_msg.orientation.x = data.i;
     imu_msg.orientation.y = data.j;
@@ -92,13 +103,17 @@ int main(int argc, char ** argv) try
   };
 
   auto spi = std::make_shared<SPI>("/dev/spidev0.0", SPI_MODE_3, 8, 3*1000*1000UL);
-  auto bno085 = std::make_shared<BNO085>(spi, gpio_nirq, arvrStabilizedRV_callback);
+  auto bno085 = std::make_shared<BNO085>(spi, gpio_nirq, gyro_callback, attitude_callback);
 
   /* Configure sensor for obtaining current orientation
    * as a quaternion with accuracy estimation.
    */
-  if (auto const rc = bno085->config(); rc != SH2_OK) {
-    std::cerr << "config failed with error code " << rc << std::endl;
+  if (auto const rc = bno085->enableGyroscope(); rc != SH2_OK) {
+    std::cerr << "\"enableGyroscope()\" failed with error code " << rc << std::endl;
+    return EXIT_FAILURE;
+  }
+  if (auto const rc = bno085->enableAttitude(); rc != SH2_OK) {
+    std::cerr << "\"enableAttitude()\" failed with error code " << rc << std::endl;
     return EXIT_FAILURE;
   }
 
