@@ -1,5 +1,5 @@
 #!/bin/sh
-cd tmp/colcon_ws
+cd /tmp/colcon_ws
 . /opt/ros/humble/setup.sh
 . install/setup.sh
 echo "Starting pika-spark-bno085-driver ..."
