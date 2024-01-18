@@ -78,9 +78,9 @@ int main(int argc, char ** argv) try
 
   auto const acc_callback = [node, &imu_msg](sh2_Accelerometer_t const & data)
   {
-    RCLCPP_INFO(node->get_logger(),
-                "Acceleration [x, y, z,] = [%0.3f, %0.3f, %0.3f] m/s²",
-                data.x, data.y, data.z);
+    RCLCPP_INFO_THROTTLE(node->get_logger(), *node->get_clock(), 1000UL,
+                         "Acceleration [x, y, z,] = [%0.3f, %0.3f, %0.3f] m/s²",
+                         data.x, data.y, data.z);
 
     imu_msg.linear_acceleration.x = data.x;
     imu_msg.linear_acceleration.y = data.y;
@@ -89,9 +89,9 @@ int main(int argc, char ** argv) try
 
   auto const gyro_callback = [node, &imu_msg](sh2_Gyroscope_t const & data)
   {
-    RCLCPP_INFO(node->get_logger(),
-                "Gyroscope    [x, y, z,] = [%0.3f, %0.3f, %0.3f] rad/s",
-                data.x, data.y, data.z);
+    RCLCPP_INFO_THROTTLE(node->get_logger(), *node->get_clock(), 1000UL,
+                         "Gyroscope    [x, y, z,] = [%0.3f, %0.3f, %0.3f] rad/s",
+                         data.x, data.y, data.z);
 
     imu_msg.angular_velocity.x = data.x;
     imu_msg.angular_velocity.y = data.y;
@@ -100,7 +100,7 @@ int main(int argc, char ** argv) try
 
   auto const attitude_callback = [node, imu_pub, &imu_msg](sh2_RotationVectorWAcc_t const & data)
   {
-    RCLCPP_INFO(node->get_logger(),
+    RCLCPP_INFO_THROTTLE(node->get_logger(), *node->get_clock(), 250UL,
                 "Attitude     [i, j, k, real, accuracy] = [%0.3f, %0.3f, %0.3f, %0.3f, %0.3f]",
                 data.i, data.j, data.k, data.real, data.accuracy);
 
