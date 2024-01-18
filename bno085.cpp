@@ -19,9 +19,11 @@
 
 BNO085::BNO085(std::shared_ptr<SPI> const spi,
                std::shared_ptr<SysGPIO> const nirq,
+               LinearAccelerationCallbackFunc const acc_callback,
                CalibratedGyroscopeCallbackFunc const gyro_callback,
                StabilizedRotationVectorWAccuracyCallbackFunc const attitude_callback)
 : BNO085_HAL{spi, nirq}
+, _acc_callback{acc_callback}
 , _gyro_callback{gyro_callback}
 , _attitude_callback{attitude_callback}
 {
@@ -31,6 +33,24 @@ BNO085::BNO085(std::shared_ptr<SPI> const spi,
 /**************************************************************************************
  * PUBLIC MEMBER FUNCTIONS
  **************************************************************************************/
+
+int BNO085::enableAccelerometer()
+{
+  sh2_SensorConfig_t const bno085_config =
+    {
+      /* .changeSensitivityEnabled  = */ false,
+      /* .changeSensitivityRelative = */ false,
+      /* .wakeupEnabled             = */ false,
+      /* .alwaysOnEnabled           = */ false,
+      /* .sniffEnabled              = */ false,
+      /* .changeSensitivity         = */ 0,
+      /* .reportInterval_us         = */ 5000, /* 200 Hz */
+      /* .batchInterval_us          = */ 0,
+      /* .sensorSpecific            = */ 0
+    };
+
+  return sh2_setSensorConfig(SH2_LINEAR_ACCELERATION, &bno085_config);
+}
 
 int BNO085::enableGyroscope()
 {
@@ -84,7 +104,9 @@ void BNO085::internal_sh2_sensor_callback(sh2_SensorEvent_t * event)
   if (auto const rc = sh2_decodeSensorEvent(&sensor_value, event); rc != SH2_OK)
     throw BNO085_Exception("error decoding sensor event, rc = %d", rc);
 
-  if (sensor_value.sensorId == SH2_GYROSCOPE_CALIBRATED)
+  if (sensor_value.sensorId == SH2_LINEAR_ACCELERATION)
+    _acc_callback(sensor_value.un.linearAcceleration);
+  else if (sensor_value.sensorId == SH2_GYROSCOPE_CALIBRATED)
     _gyro_callback(sensor_value.un.gyroscope);
   else if (sensor_value.sensorId == SH2_ARVR_STABILIZED_RV)
    _attitude_callback(sensor_value.un.arvrStabilizedRV);

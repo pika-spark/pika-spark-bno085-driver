@@ -76,10 +76,21 @@ int main(int argc, char ** argv) try
   gpio_nirq->gpio_set_dir(false);
   gpio_nirq->gpio_set_edge("falling");
 
+  auto const acc_callback = [node, &imu_msg](sh2_Accelerometer_t const & data)
+  {
+    RCLCPP_INFO(node->get_logger(),
+                "Acceleration [x, y, z,] = [%0.3f, %0.3f, %0.3f] m/s²",
+                data.x, data.y, data.z);
+
+    imu_msg.linear_acceleration.x = data.x;
+    imu_msg.linear_acceleration.y = data.y;
+    imu_msg.linear_acceleration.z = data.z;
+  };
+
   auto const gyro_callback = [node, &imu_msg](sh2_Gyroscope_t const & data)
   {
     RCLCPP_INFO(node->get_logger(),
-                "[x, y, z,] = [%0.3f, %0.3f, %0.3f] rad/s",
+                "Gyroscope    [x, y, z,] = [%0.3f, %0.3f, %0.3f] rad/s",
                 data.x, data.y, data.z);
 
     imu_msg.angular_velocity.x = data.x;
@@ -90,7 +101,7 @@ int main(int argc, char ** argv) try
   auto const attitude_callback = [node, imu_pub, &imu_msg](sh2_RotationVectorWAcc_t const & data)
   {
     RCLCPP_INFO(node->get_logger(),
-                "[i, j, k, real, accuracy] = [%0.3f, %0.3f, %0.3f, %0.3f, %0.3f]",
+                "Attitude     [i, j, k, real, accuracy] = [%0.3f, %0.3f, %0.3f, %0.3f, %0.3f]",
                 data.i, data.j, data.k, data.real, data.accuracy);
 
     imu_msg.header.stamp = node->now();
@@ -103,11 +114,15 @@ int main(int argc, char ** argv) try
   };
 
   auto spi = std::make_shared<SPI>("/dev/spidev0.0", SPI_MODE_3, 8, 3*1000*1000UL);
-  auto bno085 = std::make_shared<BNO085>(spi, gpio_nirq, gyro_callback, attitude_callback);
+  auto bno085 = std::make_shared<BNO085>(spi, gpio_nirq, acc_callback, gyro_callback, attitude_callback);
 
   /* Configure sensor for obtaining current orientation
    * as a quaternion with accuracy estimation.
    */
+  if (auto const rc = bno085->enableAccelerometer(); rc != SH2_OK) {
+    std::cerr << "\"enableAccelerometer()\" failed with error code " << rc << std::endl;
+    return EXIT_FAILURE;
+  }
   if (auto const rc = bno085->enableGyroscope(); rc != SH2_OK) {
     std::cerr << "\"enableGyroscope()\" failed with error code " << rc << std::endl;
     return EXIT_FAILURE;

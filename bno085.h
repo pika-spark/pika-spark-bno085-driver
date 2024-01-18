@@ -24,16 +24,19 @@
 class BNO085 : private BNO085_HAL
 {
 public:
+  typedef std::function<void(sh2_Accelerometer_t const &)> LinearAccelerationCallbackFunc;
   typedef std::function<void(sh2_Gyroscope_t const &)> CalibratedGyroscopeCallbackFunc;
   typedef std::function<void(sh2_RotationVectorWAcc_t const &)> StabilizedRotationVectorWAccuracyCallbackFunc;
 
   BNO085(std::shared_ptr<SPI> const spi,
          std::shared_ptr<SysGPIO> const nirq,
+         LinearAccelerationCallbackFunc const acc_callback,
          CalibratedGyroscopeCallbackFunc const gyro_callback,
          StabilizedRotationVectorWAccuracyCallbackFunc const attitude_callback);
   virtual ~BNO085() { }
 
 
+  int  enableAccelerometer();
   int  enableGyroscope();
   int  enableAttitude();
   void spinOnce();
@@ -44,6 +47,7 @@ protected:
 
 
 private:
+  LinearAccelerationCallbackFunc const _acc_callback;
   CalibratedGyroscopeCallbackFunc const _gyro_callback;
   StabilizedRotationVectorWAccuracyCallbackFunc const _attitude_callback;
 };
