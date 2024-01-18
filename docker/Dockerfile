@@ -1,16 +1,19 @@
 # Copyright Alexander Entinger, MSc / LXRobotics GmbH
-# This docker file allows building and running of 10BASE-T1S user space driver for the onsemi NCN26010 SPI-MAC-PHY.
-FROM alpine:3.18
+FROM docker.io/arm64v8/ros:humble-ros-base
 
-RUN apk add git g++ make cmake linux-headers
+RUN apt-get update && \
+    apt-get install -y git && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-RUN cd /tmp && \
-    git clone --recursive https://github.com/pika-spark/pika-spark-bno085-driver && \
+RUN mkdir -p /tmp/colcon_ws/src
+WORKDIR /tmp/colcon_ws/src
+RUN git clone --recursive https://github.com/pika-spark/pika-spark-bno085-driver && \
     cd pika-spark-bno085-driver && \
-    mkdir build && \
-    cd build && \
-    cmake .. && \
-    make
+    git checkout ros
+
+WORKDIR /tmp/colcon_ws
+RUN . /opt/ros/humble/setup.sh && colcon build --symlink-install
 
 COPY start.sh /
 RUN chmod ugo+x /start.sh
