@@ -105,6 +105,8 @@ int main(int argc, char ** argv) try
                 data.i, data.j, data.k, data.real, data.accuracy);
 
     imu_msg.header.stamp = node->now();
+    imu_msg.header.frame_id = std::string("imu");
+
     imu_msg.orientation.x = data.i;
     imu_msg.orientation.y = data.j;
     imu_msg.orientation.z = data.k;
