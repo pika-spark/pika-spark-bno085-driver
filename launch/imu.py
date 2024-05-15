@@ -10,7 +10,7 @@ def generate_launch_description():
       package='pika_spark_bno085_driver',
       executable='pika_spark_bno085_driver_node',
       name='pika_spark_bno085_driver',
-      namespace='',
+      namespace='t07',
       output='screen',
       emulate_tty=True,
       parameters=[
