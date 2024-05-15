@@ -100,7 +100,7 @@ int main(int argc, char ** argv) try
 
   auto const attitude_callback = [node, imu_pub, &imu_msg](sh2_RotationVectorWAcc_t const & data)
   {
-    RCLCPP_INFO_THROTTLE(node->get_logger(), *node->get_clock(), 250UL,
+    RCLCPP_DEBUG_THROTTLE(node->get_logger(), *node->get_clock(), 250UL,
                 "Attitude     [i, j, k, real, accuracy] = [%0.3f, %0.3f, %0.3f, %0.3f, %0.3f]",
                 data.i, data.j, data.k, data.real, data.accuracy);
 
