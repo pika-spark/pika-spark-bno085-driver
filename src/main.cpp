@@ -93,9 +93,9 @@ int main(int argc, char ** argv) try
                           "Gyroscope    [x, y, z,] = [%0.3f, %0.3f, %0.3f] rad/s",
                           data.x, data.y, data.z);
 
-    imu_msg.angular_velocity.x = data.x;
-    imu_msg.angular_velocity.y = data.y;
-    imu_msg.angular_velocity.z = data.z;
+    imu_msg.angular_velocity.x = data.x * M_PI / 180.f;
+    imu_msg.angular_velocity.y = data.y * M_PI / 180.f;
+    imu_msg.angular_velocity.z = data.z * M_PI / 180.f;
   };
 
   auto const attitude_callback = [node, imu_pub, &imu_msg](sh2_RotationVectorWAcc_t const & data)
