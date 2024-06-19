@@ -279,7 +279,10 @@ int SysGPIO::gpio_poll(int gpio_fd, int timeout) const
 
   if (fdset[0].revents & POLLPRI) {
     // dummy read
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-result"
     (void)read(fdset[0].fd, buf, MAX_BUF);
+#pragma GCC diagnostic pop
   }
 
   return rc;
